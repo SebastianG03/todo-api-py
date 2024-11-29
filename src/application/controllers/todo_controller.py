@@ -6,7 +6,6 @@ from core.services.logger_service import logger
 
 from entities.notes.todo_model import TodoModel, TodoUpdate
 
-
 todo_router = APIRouter(prefix="/todo", tags=["todo"])
 
 @todo_router.get("/all")
