@@ -1,17 +1,19 @@
 import datetime
 from fastapi.responses import JSONResponse
 from fastapi import status
+from json import dumps
 
 from entities.notes.todo_model import TodoModel, TodoUpdate
 from entities.tables.todo_table import TodoTable
 from core.database.database import Session
+from core.services.logger_service import logger
 
 def create_todo(todo: TodoModel, session: Session):
     try:
         todo_db = TodoTable()
         todo_db.title = todo.title
         todo_db.description = todo.description
-        todo_db.date_created = datetime.datetime.now()  
+        todo_db.date_created = str(datetime.datetime.now())  
         todo_db.completed = todo.completed
         
         session.add(todo_db)
@@ -41,10 +43,21 @@ def get_todos(session: Session):
 
 def update_todo(id: int, todo: TodoUpdate, session: Session):
     try:
+        logger.info("Updating todo with id: %s", id)
         original_todo = session.query(TodoTable).filter(TodoTable.id == id).first()
         
-        todo_db = _check_todo_data(new_todo=todo, original_todo=original_todo)
+        logger.info("Searching todo")
+        if original_todo is None:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"message": "Todo not found"}
+            )
         
+        logger.info("Updating todo data")
+        todo_db: TodoTable = _check_todo_data(new_todo=todo, original_todo=original_todo)
+        todo_db.id = id
+        
+        logger.info("Commiting changes")
         session.commit()
         session.refresh(todo_db)
         
@@ -87,28 +100,18 @@ def delete_todo(id: int, session: Session):
         )
 
 def _check_todo_data(new_todo: TodoUpdate, original_todo: TodoTable) -> TodoTable:
-    
-    if (new_todo.new_todo is not None and
-        new_todo.title.strip('') != "" and
-        original_todo.title != new_todo.title 
-        ):
-        original_todo.title = new_todo.title
-        
-    if (new_todo.description is not None and
-        new_todo.description.strip('') != "" and
-        original_todo.description != new_todo.description):
-        original_todo.description = new_todo.description
-        
-    if original_todo.completed != new_todo.completed:
-        original_todo.completed = new_todo.completed
-        
-    original_todo.date_created = datetime.datetime.now()
-    
-    updated_todo = TodoTable()
-    updated_todo.id = original_todo.id
-    updated_todo.title = original_todo.title
-    updated_todo.description = original_todo.description
-    updated_todo.date_created = original_todo.date_created
-    updated_todo.completed = original_todo.completed
-    
-    return update_todo
+    try:
+        if new_todo.title and new_todo.title.strip('') != '' and original_todo.title != new_todo.title:
+            original_todo.title = new_todo.title.strip('')
+
+        if new_todo.description and new_todo.description.strip('') != '' and original_todo.description != new_todo.description:
+            original_todo.description = new_todo.description.strip('')
+
+        if new_todo.completed is not None and original_todo.completed != new_todo.completed:
+            original_todo.completed = new_todo.completed
+
+        original_todo.date_created = str(datetime.datetime.now())  
+        return original_todo
+    except Exception as err:
+        logger.error("Error validating todo data: %s", str(err))
+        raise ValueError("Invalid todo data")

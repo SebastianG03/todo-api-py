@@ -18,3 +18,7 @@ class TodoUpdate(BaseModel):
     description: Optional[str] = None
     completed: Optional[bool] = False
     
+    class Config():
+        orm_mode = True
+        from_attributes = True
+    

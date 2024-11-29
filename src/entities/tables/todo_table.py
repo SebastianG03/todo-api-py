@@ -6,8 +6,8 @@ class TodoTable(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     title = Column(String(70), index=True)
-    description = Column(String(255), index=True)
-    date_created = Column(DATETIME, index=True)
+    description = Column(String(255))
+    date_created = Column(String(120), index=True)
     completed = Column(Boolean, index=True)
     
     def __to_dict__(self):
