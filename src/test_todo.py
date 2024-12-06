@@ -1,11 +1,6 @@
 from fastapi.testclient import TestClient
-from fastapi import FastAPI
-from fastapi.middleware.gzip import GZipMiddleware
-from core.database.database import Base, engine
 
-from application.controllers.todo_controller import todo_router 
-
-from main import app
+from src.main import app
 
 client = TestClient(app)
 
