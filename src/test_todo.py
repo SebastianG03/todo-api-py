@@ -40,12 +40,12 @@ class TestTodoAPI(unittest.TestCase):
     def setUp(self):
         """Preparar datos antes de cada prueba"""
         self.todo = TodoTable(
+            id = 1,
             title="Initial Todo", description="Test Description", completed=False
         )
         self.db.add(self.todo)
         self.db.commit()
         self.db.refresh(self.todo)
-        self.todo = self.db.query(TodoTable).first()
 
     def tearDown(self):
         """Limpieza de datos después de cada prueba"""
