@@ -4,16 +4,17 @@ from src.main import app
 from src.core.database.database import Base, get_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-
 from src.entities.tables.todo_table import TodoTable
 
-
+# Configuración de la base de datos de prueba
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
 TestEngine = create_engine(SQLALCHEMY_TEST_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=TestEngine)
 
+# Crear tablas
 Base.metadata.create_all(bind=TestEngine)
 
+# Anular dependencia de la base de datos
 def override_get_session():
     try:
         db = TestingSessionLocal()
@@ -22,37 +23,33 @@ def override_get_session():
         db.close()
 
 app.dependency_overrides[get_session] = override_get_session
-
 client = TestClient(app)
 
 class TestTodoAPI(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Ejecutado una vez antes de todas las pruebas"""
+        """Configura la base de datos de prueba antes de todas las pruebas"""
         cls.db = TestingSessionLocal()
 
     @classmethod
     def tearDownClass(cls):
-        """Finalizando las pruebas"""
+        """Limpia la base de datos después de todas las pruebas"""
+        cls.db.query(TodoTable).delete()
+        cls.db.commit()
         cls.db.close()
 
-    def setUp(self):
-        """Preparar datos antes de cada prueba"""
-        self.todo = TodoTable(
-            id = 1,
-            title="Initial Todo", description="Test Description", completed=False
-        )
-        self.db.add(self.todo)
-        self.db.commit()
-        self.db.refresh(self.todo)
-
-    def tearDown(self):
-        """Limpieza de datos después de cada prueba"""
-        self.db.query(TodoTable).delete()
-        self.db.commit()
-
     def test_get_todos(self):
+        # Preparar datos de prueba
+        todo = TodoTable(
+            title="Initial Todo", 
+            description="Test Description", 
+            completed=False
+        )
+        self.db.add(todo)
+        self.db.commit()
+
+        # Realizar la prueba
         response = client.get("/todo/all")
         self.assertEqual(response.status_code, 200)
         todos = response.json()
@@ -72,18 +69,38 @@ class TestTodoAPI(unittest.TestCase):
         self.assertEqual(todo["title"], payload["title"])
 
     def test_update_todo(self):
+        # Crear un todo para actualizar
+        todo = TodoTable(
+            title="Old Title", 
+            description="Old Description", 
+            completed=False
+        )
+        self.db.add(todo)
+        self.db.commit()
+        self.db.refresh(todo)
+
         payload = {
             "title": "Updated Title",
             "description": "Updated Description",
             "completed": True
         }
-        response = client.put(f"/todo/update/{self.todo.id}", json=payload)
+        response = client.put(f"/todo/update/{todo.id}", json=payload)
         self.assertEqual(response.status_code, 200)
         updated_todo = response.json()
         self.assertEqual(updated_todo["title"], payload["title"])
 
     def test_delete_todo(self):
-        response = client.delete(f"/todo/delete/{self.todo.id}")
+        # Crear un todo para eliminar
+        todo = TodoTable(
+            title="To Delete", 
+            description="To be deleted", 
+            completed=False
+        )
+        self.db.add(todo)
+        self.db.commit()
+        self.db.refresh(todo)
+
+        response = client.delete(f"/todo/delete/{todo.id}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["message"], "Todo deleted successfully")
 
