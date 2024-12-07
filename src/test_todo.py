@@ -1,9 +1,12 @@
 import unittest
 from fastapi.testclient import TestClient
 from src.main import app
-from src.core.database.database import Base, engine, get_session
+from src.core.database.database import Base, get_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+
+from src.entities.tables.todo_table import TodoTable
+
 
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
 TestEngine = create_engine(SQLALCHEMY_TEST_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -36,7 +39,6 @@ class TestTodoAPI(unittest.TestCase):
 
     def setUp(self):
         """Preparar datos antes de cada prueba"""
-        from src.core.database.database import TodoTable
         self.todo = TodoTable(
             title="Initial Todo", description="Test Description", completed=False
         )
