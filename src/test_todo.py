@@ -45,6 +45,7 @@ class TestTodoAPI(unittest.TestCase):
         self.db.add(self.todo)
         self.db.commit()
         self.db.refresh(self.todo)
+        self.todo = self.db.query(TodoTable).first()
 
     def tearDown(self):
         """Limpieza de datos después de cada prueba"""
@@ -76,7 +77,7 @@ class TestTodoAPI(unittest.TestCase):
             "description": "Updated Description",
             "completed": True
         }
-        response = client.put(f"/todo/update/1", json=payload)
+        response = client.put(f"/todo/update/{self.todo.id}", json=payload)
         self.assertEqual(response.status_code, 200)
         updated_todo = response.json()
         self.assertEqual(updated_todo["title"], payload["title"])
