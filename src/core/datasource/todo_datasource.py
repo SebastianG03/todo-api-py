@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse
 from fastapi import status
 from json import dumps
 
-from src.entities.notes.todo_model import TodoModel, TodoUpdate
-from src.entities.tables.todo_table import TodoTable
-from src.core.database.database import Session
-from src.core.services.logger_service import logger
+from entities.notes.todo_model import TodoModel, TodoUpdate
+from entities.tables.todo_table import TodoTable
+from core.database.database import Session
+from core.services.logger_service import logger
 
 def create_todo(todo: TodoModel, session: Session):
     try:

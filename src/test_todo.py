@@ -5,9 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
-from src.main import app
-from src.core.database.database import Base, get_session
-from src.entities.tables.todo_table import TodoTable
+from main import app
+from core.database.database import Base, get_session
+from entities.tables.todo_table import TodoTable
 
 # Configuración de la base de datos de prueba
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///./test_db.db"

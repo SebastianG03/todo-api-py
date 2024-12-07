@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
-from src.core.database.database import Base, engine
+from core.database.database import Base, engine
 
-from src.application.controllers.todo_controller import todo_router 
+from application.controllers.todo_controller import todo_router 
 
 Base.metadata.create_all(bind = engine)
 

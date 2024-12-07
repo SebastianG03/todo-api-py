@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
 
-from src.core.database.database import get_session, Session
-import src.core.datasource.todo_datasource as ds
-from src.core.services.logger_service import logger
+from core.database.database import get_session, Session
+from core.services.logger_service import logger
 
-from src.entities.notes.todo_model import TodoModel, TodoUpdate
+import core.datasource.todo_datasource as ds
+
+from entities.notes.todo_model import TodoModel, TodoUpdate
 
 todo_router = APIRouter(prefix="/todo", tags=["todo"])
 
