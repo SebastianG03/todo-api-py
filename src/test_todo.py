@@ -48,7 +48,6 @@ class TestTodoAPI(unittest.TestCase):
 
     def tearDown(self):
         """Limpieza de datos después de cada prueba"""
-        from src.core.database.database import TodoTable
         self.db.query(TodoTable).delete()
         self.db.commit()
 
