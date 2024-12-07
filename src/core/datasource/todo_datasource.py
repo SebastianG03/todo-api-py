@@ -23,7 +23,7 @@ def create_todo(todo: TodoModel, session: Session):
             status_code=status.HTTP_201_CREATED,
             content={
                 "message": "Todo created successfully",
-                "Todo Data": todo_db.__to_dict__()
+                "todo": todo_db.__to_dict__()
                 }
         )
           
@@ -37,7 +37,7 @@ def get_todos(session: Session):
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
-            "Todos": [todo.__to_dict__() for todo in session.query(TodoTable)]
+            "todos": [todo.__to_dict__() for todo in session.query(TodoTable)]
         }
     )
 
@@ -65,7 +65,7 @@ def update_todo(id: int, todo: TodoUpdate, session: Session):
             status_code=status.HTTP_200_OK,
             content={
                 "message": "Todo updated successfully",
-                "Todo Data": todo_db.__to_dict__()
+                "todo": todo_db.__to_dict__()
                 }
         )
         
