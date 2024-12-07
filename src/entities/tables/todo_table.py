@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, DATETIME
-from core.database.database import Base
+from src.core.database.database import Base
 
 class TodoTable(Base):
     __tablename__ = "todos"
