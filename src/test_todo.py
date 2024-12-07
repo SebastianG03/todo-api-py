@@ -34,7 +34,7 @@ class TestTodoAPI(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """Ejecutado una vez después de todas las pruebas"""
+        """Finalizando las pruebas"""
         cls.db.close()
 
     def setUp(self):
