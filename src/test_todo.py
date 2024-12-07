@@ -66,6 +66,7 @@ class TestTodoAPI(unittest.TestCase):
             "completed": False
         }
         response = client.post("/todo/create", json=payload)
+        self.response = response
         self.assertEqual(response.status_code, 201)
         todo = response.json()  
         self.assertEqual(todo["title"], payload["title"])
@@ -76,8 +77,8 @@ class TestTodoAPI(unittest.TestCase):
             "description": "Updated Description",
             "completed": True
         }
-        todo = self.db.query(TodoTable).filter(TodoTable.id == self.todo.id).first()
-        response = client.put(f"/todo/update/{todo.id}", json=payload)
+        todo = self.response
+        response = client.put(f"/todo/update/{todo['id']}", json=payload)
         self.assertEqual(response.status_code, 200)
         updated_todo = response.json()
         self.assertEqual(updated_todo["title"], payload["title"])
